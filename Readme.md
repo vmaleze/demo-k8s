@@ -9,8 +9,9 @@
   * Build and tag image then push it to your docker repo
   * Deploy it via the dashboard
   * Get the Deployment.yml for further usage
-  * Setup the service `kubectl expose my-service --type=LoadBalancer --port=8080 --targetPort=80`
+  * Setup the service `kubectl expose deployment my-service --type=LoadBalancer --port=80 --target-port=8080`
   * Verify that everything works
+  * Add readinessProbe on actuator endpoint
 
 * Create a second µs following the previous setup
   * Make it call the first one using a config variable
