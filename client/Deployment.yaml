@@ -1,0 +1,57 @@
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: client-k8s
+  namespace: default
+  labels:
+    k8s-app: client-k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: client-k8s
+  template:
+    metadata:
+      name: client-k8s
+      labels:
+        k8s-app: client-k8s
+    spec:
+      containers:
+        - name: client-k8s
+          image: vmaleze/client-k8s
+          resources: {}
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+            procMount: Default
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 3
+          volumeMounts:
+            - name: client-config
+              mountPath: /deployment/config
+      volumes:
+        - name: client-config
+          configMap:
+            name: client-config
+            items:
+              - key: application.yml
+                path: application.yml
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
